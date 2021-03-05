@@ -1,6 +1,6 @@
 package com.example.androiddevchallenge.utils
 
-enum class CountDownTimerState {
+internal enum class CountDownTimerState {
     IN_PROGRESS,
     STOPPED,
     IDLE
