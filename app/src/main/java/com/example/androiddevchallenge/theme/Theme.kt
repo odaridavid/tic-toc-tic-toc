@@ -22,19 +22,25 @@ import androidx.compose.material.lightColors
 import androidx.compose.runtime.Composable
 
 private val DarkColorPalette = darkColors(
-    primary = purple200,
-    primaryVariant = purple700,
-    secondary = teal200
+    primary = orange,
+    primaryVariant = orangeLighterVariant,
+    secondary = white
 )
 
 private val LightColorPalette = lightColors(
-    primary = purple500,
-    primaryVariant = purple700,
-    secondary = teal200
+    primary = orange,
+    primaryVariant = orangeDarkerVariant,
+    secondary = white,
+    onPrimary = black,
+    surface = orangeLighterVariant,
+    background = orangeLighterVariant
 )
 
 @Composable
-fun TicTocTicTocTheme(darkTheme: Boolean = isSystemInDarkTheme(), content: @Composable() () -> Unit) {
+fun TicTocTicTocTheme(
+    darkTheme: Boolean = isSystemInDarkTheme(),
+    content: @Composable() () -> Unit
+) {
     val colors = if (darkTheme) {
         DarkColorPalette
     } else {
@@ -43,6 +49,7 @@ fun TicTocTicTocTheme(darkTheme: Boolean = isSystemInDarkTheme(), content: @Comp
 
     MaterialTheme(
         colors = colors,
-        content = content
+        content = content,
+        typography = typography
     )
 }
