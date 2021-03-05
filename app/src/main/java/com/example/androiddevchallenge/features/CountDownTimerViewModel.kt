@@ -13,9 +13,6 @@ internal class CountDownTimerViewModel : ViewModel() {
     private val _durationInMinutesAndSeconds = MutableLiveData("00:00")
     val durationInMinutesAndSeconds: LiveData<String> = _durationInMinutesAndSeconds
 
-    private val _isFinished = MutableLiveData(false)
-    val isFinished: LiveData<Boolean> = _isFinished
-
     private val _timerState = MutableLiveData(CountDownTimerState.IDLE)
     val timerState: LiveData<CountDownTimerState> = _timerState
 
@@ -55,7 +52,7 @@ internal class CountDownTimerViewModel : ViewModel() {
                 _durationInMinutesAndSeconds.value = formattedDuration
             },
             onCountdownFinished = {
-                _isFinished.value = true
+                updateTimerState(state = CountDownTimerState.IDLE)
             }
         )
     }
