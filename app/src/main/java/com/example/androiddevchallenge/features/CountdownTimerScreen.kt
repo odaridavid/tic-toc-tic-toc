@@ -1,7 +1,9 @@
 package com.example.androiddevchallenge.features
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
@@ -13,6 +15,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -36,8 +39,11 @@ internal fun CountDownTimerScreen(countDownTimerViewModel: CountDownTimerViewMod
     Column(
         modifier = Modifier
             .fillMaxWidth()
+            .fillMaxHeight()
+            .background(color = MaterialTheme.colors.background)
             .padding(32.dp),
-        horizontalAlignment = Alignment.CenterHorizontally
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center
     ) {
         Text(
             text = duration,
@@ -49,25 +55,51 @@ internal fun CountDownTimerScreen(countDownTimerViewModel: CountDownTimerViewMod
         )
 
         Icon(
-            imageVector = when (timerState) {
-                CountDownTimerState.IDLE,
-                CountDownTimerState.STOPPED -> Icons.Filled.PlayCircleFilled
-                CountDownTimerState.IN_PROGRESS -> Icons.Filled.PauseCircleFilled
-            },
-            contentDescription = "Start Timer Icon",
+            imageVector = handleState(
+                timerState = timerState,
+                onTimerIdle = {
+                    Icons.Filled.PlayCircleFilled
+                },
+                onTimerInProgress = {
+                    Icons.Filled.PauseCircleFilled
+                }
+            ),
+            contentDescription = handleState(
+                timerState = timerState,
+                onTimerIdle = {
+                    "Start Timer Icon"
+                },
+                onTimerInProgress = {
+                    "Pause Timer Icon"
+                }
+            ),
             modifier = Modifier
                 .padding(32.dp)
                 .height(48.dp)
                 .width(48.dp)
+                .clip(shape = CircleShape)
                 .clickable {
-                    when (timerState) {
-                        CountDownTimerState.IDLE,
-                        CountDownTimerState.STOPPED -> countDownTimerViewModel.startCountDownTimer(
-                            durationInMilliseconds = 65_000L
-                        )
-                        CountDownTimerState.IN_PROGRESS -> countDownTimerViewModel.stopCountDownTimer()
-                    }
+                    handleState(
+                        timerState = timerState,
+                        onTimerIdle = {
+                            countDownTimerViewModel.startCountDownTimer(durationInMilliseconds = 15_000L)
+                        },
+                        onTimerInProgress = {
+                            countDownTimerViewModel.stopCountDownTimer()
+                        }
+                    )
                 }
         )
     }
+}
+
+internal fun <T> handleState(
+    timerState: CountDownTimerState,
+    onTimerIdle: () -> T,
+    onTimerInProgress: () -> T
+): T = when (timerState) {
+    CountDownTimerState.IDLE,
+    CountDownTimerState.STOPPED -> onTimerIdle()
+    CountDownTimerState.IN_PROGRESS -> onTimerInProgress()
+
 }
