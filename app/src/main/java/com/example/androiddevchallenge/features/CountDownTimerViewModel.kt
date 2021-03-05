@@ -3,7 +3,6 @@ package com.example.androiddevchallenge.features
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.example.androiddevchallenge.utils.CountDownTimerState
 import com.example.androiddevchallenge.utils.TimeUtils
 
 internal class CountDownTimerViewModel : ViewModel() {
