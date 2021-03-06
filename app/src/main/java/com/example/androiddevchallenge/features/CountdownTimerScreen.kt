@@ -1,11 +1,39 @@
+/*
+ * Copyright 2021 The Android Open Source Project
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package com.example.androiddevchallenge.features
 
 import androidx.compose.animation.animateColorAsState
-import androidx.compose.animation.core.*
+import androidx.compose.animation.core.LinearEasing
+import androidx.compose.animation.core.RepeatMode
+import androidx.compose.animation.core.animateFloat
+import androidx.compose.animation.core.infiniteRepeatable
+import androidx.compose.animation.core.rememberInfiniteTransition
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
@@ -21,7 +49,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -134,7 +161,7 @@ private fun TicTocActionButtons(
             contentDescription = handleState(
                 timerState = timerState,
                 onTimerInactive = {
-                    "Start Timer Icon" //TODO Support different locales
+                    "Start Timer Icon" // TODO Support different locales
                 },
                 onTimerActive = {
                     "Pause Timer Icon"
@@ -215,16 +242,15 @@ private fun TicTocHeader() {
 // TODO Not hardcode this one off solution
 @Composable
 private fun isLessThan10Seconds(duration: String) = duration.contains("00:10") ||
-        duration.contains("00:09") ||
-        duration.contains("00:08") ||
-        duration.contains("00:07") ||
-        duration.contains("00:06") ||
-        duration.contains("00:05") ||
-        duration.contains("00:04") ||
-        duration.contains("00:03") ||
-        duration.contains("00:02") ||
-        duration.contains("00:01")
-
+    duration.contains("00:09") ||
+    duration.contains("00:08") ||
+    duration.contains("00:07") ||
+    duration.contains("00:06") ||
+    duration.contains("00:05") ||
+    duration.contains("00:04") ||
+    duration.contains("00:03") ||
+    duration.contains("00:02") ||
+    duration.contains("00:01")
 
 internal fun <T> handleState(
     timerState: CountDownTimerState,
@@ -236,5 +262,4 @@ internal fun <T> handleState(
     CountDownTimerState.STOPPED -> onTimerInactive()
     CountDownTimerState.PAUSED -> onTimerPaused()
     CountDownTimerState.IN_PROGRESS -> onTimerActive()
-
 }
