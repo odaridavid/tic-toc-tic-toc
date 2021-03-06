@@ -23,3 +23,4 @@ val orangeLighterVariant = Color(0xFFFED06D)
 
 val black = Color(0xFF2B1D40)
 val white = Color(0xFFFFFFFF)
+val red = Color(0xFF7F0000)
