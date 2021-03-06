@@ -23,21 +23,21 @@ import androidx.compose.material.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.tooling.preview.Preview
 import com.example.androiddevchallenge.features.CountDownTimerScreen
-import com.example.androiddevchallenge.theme.TicTocTicTocTheme
+import com.example.androiddevchallenge.theme.TicTocTheme
 
 class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            TicTocTicTocTheme {
-                TicTocTicToc()
+            TicTocTheme {
+                TicToc()
             }
         }
     }
 }
 
 @Composable
-fun TicTocTicToc() {
+fun TicToc() {
     Surface(color = MaterialTheme.colors.background) {
         CountDownTimerScreen()
     }
@@ -46,15 +46,18 @@ fun TicTocTicToc() {
 @Preview("Light Theme", widthDp = 360, heightDp = 640)
 @Composable
 fun LightPreview() {
-    TicTocTicTocTheme {
-        TicTocTicToc()
+    TicTocTheme {
+        TicToc()
     }
 }
 
 @Preview("Dark Theme", widthDp = 360, heightDp = 640)
 @Composable
 fun DarkPreview() {
-    TicTocTicTocTheme(darkTheme = true) {
-        TicTocTicToc()
+    TicTocTheme(darkTheme = true) {
+        TicToc()
     }
 }
+
+// TODO Have sounds for timer?
+// TODO Extend functionality to hours - Out of scope for now
