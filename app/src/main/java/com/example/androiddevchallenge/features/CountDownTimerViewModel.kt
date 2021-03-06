@@ -1,5 +1,6 @@
 package com.example.androiddevchallenge.features
 
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -27,9 +28,21 @@ internal class CountDownTimerViewModel : ViewModel() {
         updateTimerState(state = CountDownTimerState.IN_PROGRESS)
     }
 
+    fun pauseCountDownTimer() {
+        tickTocTimer?.cancel()
+        tickTocTimer = null
+        updateTimerState(state = CountDownTimerState.PAUSED)
+    }
+
+    fun resumeCountDownTimer() {
+        // TODO Handle pause functionality here
+        updateTimerState(state = CountDownTimerState.IN_PROGRESS)
+    }
+
     fun stopCountDownTimer() {
         tickTocTimer?.cancel()
         tickTocTimer = null
+        updateDuration(durationLeftInMilliseconds = 0L)
         updateTimerState(state = CountDownTimerState.STOPPED)
     }
 
@@ -45,15 +58,19 @@ internal class CountDownTimerViewModel : ViewModel() {
         tickTocTimer = TicTocTimer(
             durationInMilliseconds = durationInMilliseconds,
             onCountdownTick = { durationLeftInMilliseconds ->
-                val formattedDuration = TimeUtils.formatMillisecondsToMinutesAndSeconds(
-                    durationInMilliseconds = durationLeftInMilliseconds
-                )
-                _durationInMinutesAndSeconds.value = formattedDuration
+                updateDuration(durationLeftInMilliseconds = durationLeftInMilliseconds)
             },
             onCountdownFinished = {
                 updateTimerState(state = CountDownTimerState.IDLE)
             }
         )
+    }
+
+    private fun updateDuration(durationLeftInMilliseconds: Long) {
+        val formattedDuration = TimeUtils.formatMillisecondsToMinutesAndSeconds(
+            durationInMilliseconds = durationLeftInMilliseconds
+        )
+        _durationInMinutesAndSeconds.value = formattedDuration
     }
 
     // endregion
