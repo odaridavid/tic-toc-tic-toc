@@ -1,7 +1,8 @@
 package com.example.androiddevchallenge.features
 
 import androidx.compose.animation.animateColorAsState
-import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.*
+import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -20,6 +21,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -30,14 +32,6 @@ internal fun CountDownTimerScreen(countDownTimerViewModel: CountDownTimerViewMod
     val timerState: CountDownTimerState by countDownTimerViewModel.timerState.observeAsState(
         CountDownTimerState.IDLE
     )
-    val animatedColor by animateColorAsState(
-        targetValue = if (isLessThan10Seconds(duration = duration))
-            MaterialTheme.colors.error
-        else
-            MaterialTheme.colors.onBackground
-    )
-
-    //TODO Animate circle blinking white in dark mode black in light mode when almost ending and filling it up
 
     Column(
         modifier = Modifier
@@ -47,113 +41,175 @@ internal fun CountDownTimerScreen(countDownTimerViewModel: CountDownTimerViewMod
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
-        Text(
-            text = "Tic Toc",
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(32.dp),
-            textAlign = TextAlign.Center,
-            style = MaterialTheme.typography.h4
-        )
+        TicTocHeader()
 
+        val backgroundColor = MaterialTheme.colors.background
+        val onBackgroundColor = MaterialTheme.colors.onBackground
         Column(
             modifier = Modifier.fillMaxHeight(),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {
-            Text(
-                text = duration,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .alpha(alpha = 0.6f)
-                    .padding(32.dp),
-                textAlign = TextAlign.Center,
-                style = MaterialTheme.typography.h3,
-                color = animatedColor
-            )
-            Row() {
-                Icon(
-                    imageVector = handleState(
-                        timerState = timerState,
-                        onTimerInactive = {
-                            Icons.Filled.PlayCircleFilled
-                        },
-                        onTimerActive = {
-                            Icons.Filled.PauseCircleFilled
-                        },
-                        onTimerPaused = {
-                            Icons.Filled.PlayCircleFilled
-                        }
-                    ),
-                    contentDescription = handleState(
-                        timerState = timerState,
-                        onTimerInactive = {
-                            "Start Timer Icon" //TODO Support different locales
-                        },
-                        onTimerActive = {
-                            "Pause Timer Icon"
-                        },
-                        onTimerPaused = {
-                            "Resume Timer Icon"
-                        }
-                    ),
-                    modifier = Modifier
-                        .padding(32.dp)
-                        .height(48.dp)
-                        .width(48.dp)
-                        .clip(shape = CircleShape)
-                        .clickable {
-                            handleState(
-                                timerState = timerState,
-                                onTimerInactive = {
-                                    countDownTimerViewModel.startCountDownTimer(
-                                        durationInMilliseconds = 15_000L // TODO Be able to set a dynamic time
-                                    )
-                                },
-                                onTimerActive = {
-                                    countDownTimerViewModel.pauseCountDownTimer()
-                                },
-                                onTimerPaused = {
-                                    countDownTimerViewModel.resumeCountDownTimer()
-                                }
-                            )
-                        }
-                )
 
-                Icon(
-                    imageVector = Icons.Filled.StopCircle,
-                    contentDescription = "Stop Timer Icon",
+            Box(contentAlignment = Alignment.Center) {
+                Canvas(
                     modifier = Modifier
-                        .padding(32.dp)
-                        .height(48.dp)
-                        .width(48.dp)
-                        .clip(shape = CircleShape)
-                        .clickable(
-                            enabled = handleState(
-                                timerState = timerState,
-                                onTimerInactive = { false },
-                                onTimerActive = { true },
-                                onTimerPaused = { true }
-                            )
-                        ) {
-                            handleState(
-                                timerState = timerState,
-                                onTimerActive = {
-                                    countDownTimerViewModel.stopCountDownTimer()
-                                },
-                                onTimerInactive = {
-                                    // Do Nothing
-                                },
-                                onTimerPaused = {
-                                    countDownTimerViewModel.stopCountDownTimer()
-                                }
-                            )
+                        .width(258.dp)
+                        .height(258.dp)
+                ) {
+                    drawCircle(
+                        color = onBackgroundColor,
+                    )
+                }
+                Canvas(
+                    modifier = Modifier
+                        .width(250.dp)
+                        .height(250.dp)
+                ) {
+                    drawCircle(
+                        color = backgroundColor,
+                    )
+                }
 
-                        }
-                )
+                TicTocDurationText(duration = duration)
             }
+            TicTocActionButtons(
+                timerState = timerState,
+                countDownTimerViewModel = countDownTimerViewModel
+            )
         }
     }
+}
+
+@Composable
+private fun TicTocDurationText(
+    duration: String
+) {
+    val infiniteTransition = rememberInfiniteTransition()
+    val alpha by infiniteTransition.animateFloat(
+        initialValue = 1.0f,
+        targetValue = 0.2f,
+        animationSpec = infiniteRepeatable(
+            animation = tween(1000, easing = LinearEasing),
+            repeatMode = RepeatMode.Reverse
+        )
+    )
+    val animatedColor by animateColorAsState(
+        targetValue = if (isLessThan10Seconds(duration = duration))
+            MaterialTheme.colors.error
+        else
+            MaterialTheme.colors.onBackground
+    )
+    Text(
+        text = duration,
+        modifier = Modifier
+            .fillMaxWidth()
+            .alpha(alpha = if (isLessThan10Seconds(duration = duration)) alpha else 0.6f)
+            .padding(32.dp),
+        textAlign = TextAlign.Center,
+        style = MaterialTheme.typography.h3,
+        color = animatedColor
+    )
+}
+
+@Composable
+private fun TicTocActionButtons(
+    timerState: CountDownTimerState,
+    countDownTimerViewModel: CountDownTimerViewModel
+) {
+    Row() {
+        Icon(
+            imageVector = handleState(
+                timerState = timerState,
+                onTimerInactive = {
+                    Icons.Filled.PlayCircleFilled
+                },
+                onTimerActive = {
+                    Icons.Filled.PauseCircleFilled
+                },
+                onTimerPaused = {
+                    Icons.Filled.PlayCircleFilled
+                }
+            ),
+            contentDescription = handleState(
+                timerState = timerState,
+                onTimerInactive = {
+                    "Start Timer Icon" //TODO Support different locales
+                },
+                onTimerActive = {
+                    "Pause Timer Icon"
+                },
+                onTimerPaused = {
+                    "Resume Timer Icon"
+                }
+            ),
+            modifier = Modifier
+                .padding(32.dp)
+                .height(48.dp)
+                .width(48.dp)
+                .clip(shape = CircleShape)
+                .clickable {
+                    handleState(
+                        timerState = timerState,
+                        onTimerInactive = {
+                            countDownTimerViewModel.startCountDownTimer(
+                                durationInMilliseconds = 15_000L // TODO Be able to set a dynamic time
+                            )
+                        },
+                        onTimerActive = {
+                            countDownTimerViewModel.pauseCountDownTimer()
+                        },
+                        onTimerPaused = {
+                            countDownTimerViewModel.resumeCountDownTimer()
+                        }
+                    )
+                }
+        )
+
+        Icon(
+            imageVector = Icons.Filled.StopCircle,
+            contentDescription = "Stop Timer Icon",
+            modifier = Modifier
+                .padding(32.dp)
+                .height(48.dp)
+                .width(48.dp)
+                .clip(shape = CircleShape)
+                .clickable(
+                    // TODO Show different color if disabled
+                    enabled = handleState(
+                        timerState = timerState,
+                        onTimerInactive = { false },
+                        onTimerActive = { true },
+                        onTimerPaused = { true }
+                    )
+                ) {
+                    handleState(
+                        timerState = timerState,
+                        onTimerActive = {
+                            countDownTimerViewModel.stopCountDownTimer()
+                        },
+                        onTimerInactive = {
+                            // Do Nothing
+                        },
+                        onTimerPaused = {
+                            countDownTimerViewModel.stopCountDownTimer()
+                        }
+                    )
+                }
+        )
+    }
+}
+
+@Composable
+private fun TicTocHeader() {
+    Text(
+        text = "Tic Toc",
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(32.dp),
+        textAlign = TextAlign.Center,
+        style = MaterialTheme.typography.h4
+    )
 }
 
 // TODO Not hardcode this one off solution
