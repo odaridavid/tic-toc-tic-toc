@@ -55,8 +55,10 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 
 @Composable
 internal fun CountDownTimerScreen(countDownTimerViewModel: CountDownTimerViewModel = viewModel()) {
-    val duration: String by countDownTimerViewModel.durationInMinutesAndSeconds.observeAsState("00:00")
-    val remainingDuration:Long by countDownTimerViewModel.remainingDurationInMilliSeconds.observeAsState(0L)
+    val formattedDuration: String by countDownTimerViewModel.formattedDuration.observeAsState("00:00")
+    val remainingDuration: Long by countDownTimerViewModel.remainingDurationInMilliSeconds.observeAsState(
+        0L
+    )
     val timerState: CountDownTimerState by countDownTimerViewModel.timerState.observeAsState(
         CountDownTimerState.IDLE
     )
@@ -99,7 +101,7 @@ internal fun CountDownTimerScreen(countDownTimerViewModel: CountDownTimerViewMod
                     )
                 }
 
-                TicTocDurationText(duration = duration,remainingDuration = remainingDuration)
+                TicTocDurationText(duration = formattedDuration, remainingDuration = remainingDuration)
             }
             TicTocActionButtons(
                 timerState = timerState,
@@ -112,7 +114,7 @@ internal fun CountDownTimerScreen(countDownTimerViewModel: CountDownTimerViewMod
 @Composable
 private fun TicTocDurationText(
     duration: String,
-    remainingDuration:Long
+    remainingDuration: Long
 ) {
     val infiniteTransition = rememberInfiniteTransition()
     val alpha by infiniteTransition.animateFloat(
@@ -242,7 +244,7 @@ private fun TicTocHeader() {
 }
 
 @Composable
-private fun isLessThan10Seconds(remainingDuration: Long) = remainingDuration<10_000L
+private fun isLessThan10Seconds(remainingDuration: Long) = remainingDuration < 10_000L
 
 internal fun <T> handleState(
     timerState: CountDownTimerState,
