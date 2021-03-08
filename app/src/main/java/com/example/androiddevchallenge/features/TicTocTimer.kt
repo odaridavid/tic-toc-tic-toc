@@ -21,7 +21,7 @@ internal class TicTocTimer(
     durationInMilliseconds: Long,
     private val onCountdownTick: (durationLeftInMilliseconds: Long) -> Unit,
     private val onCountdownFinished: () -> Unit,
-    tickInterval: Long = 1_000L
+    tickInterval: Long = 100L
 ) : CountDownTimer(durationInMilliseconds, tickInterval) {
 
     override fun onTick(millisUntilFinished: Long) {
