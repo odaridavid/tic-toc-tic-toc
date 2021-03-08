@@ -31,7 +31,8 @@ internal class CountDownTimerViewModel : ViewModel() {
     val timerState: LiveData<CountDownTimerState> = _timerState
 
     private var tickTocTimer: TicTocTimer? = null
-    private var remainingDurationInMilliSeconds:Long = 0L
+    private val _remainingDurationInMilliSeconds= MutableLiveData<Long>(0L)
+    val remainingDurationInMilliSeconds:LiveData<Long> = _remainingDurationInMilliSeconds
 
     // endregion
 
@@ -51,7 +52,7 @@ internal class CountDownTimerViewModel : ViewModel() {
 
     fun resumeCountDownTimer() {
         updateTimerState(state = CountDownTimerState.IN_PROGRESS)
-        createTicTocTimer(remainingDurationInMilliSeconds)
+        createTicTocTimer(_remainingDurationInMilliSeconds.value!!)
         tickTocTimer?.start()
     }
 
@@ -87,7 +88,7 @@ internal class CountDownTimerViewModel : ViewModel() {
             durationInMilliseconds = durationLeftInMilliseconds
         )
         _durationInMinutesAndSeconds.value = formattedDuration
-        remainingDurationInMilliSeconds = durationLeftInMilliseconds
+        _remainingDurationInMilliSeconds.value = durationLeftInMilliseconds
     }
 
     // endregion
