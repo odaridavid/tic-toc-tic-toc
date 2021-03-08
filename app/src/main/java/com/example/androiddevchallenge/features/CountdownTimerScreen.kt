@@ -243,7 +243,6 @@ private fun TicTocHeader() {
     )
 }
 
-@Composable
 private fun isLessThan10Seconds(remainingDuration: Long) = remainingDuration < 10_000L
 
 internal fun <T> handleState(
