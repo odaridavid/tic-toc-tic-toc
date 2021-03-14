@@ -55,7 +55,10 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 
 @Composable
 internal fun CountDownTimerScreen(countDownTimerViewModel: CountDownTimerViewModel = viewModel()) {
-    val duration: String by countDownTimerViewModel.durationInMinutesAndSeconds.observeAsState("00:00")
+    val formattedDuration: String by countDownTimerViewModel.formattedDuration.observeAsState("00:00")
+    val remainingDuration: Long by countDownTimerViewModel.remainingDurationInMilliSeconds.observeAsState(
+        0L
+    )
     val timerState: CountDownTimerState by countDownTimerViewModel.timerState.observeAsState(
         CountDownTimerState.IDLE
     )
@@ -98,7 +101,7 @@ internal fun CountDownTimerScreen(countDownTimerViewModel: CountDownTimerViewMod
                     )
                 }
 
-                TicTocDurationText(duration = duration)
+                TicTocDurationText(duration = formattedDuration, remainingDuration = remainingDuration)
             }
             TicTocActionButtons(
                 timerState = timerState,
@@ -110,7 +113,8 @@ internal fun CountDownTimerScreen(countDownTimerViewModel: CountDownTimerViewMod
 
 @Composable
 private fun TicTocDurationText(
-    duration: String
+    duration: String,
+    remainingDuration: Long
 ) {
     val infiniteTransition = rememberInfiniteTransition()
     val alpha by infiniteTransition.animateFloat(
@@ -122,7 +126,7 @@ private fun TicTocDurationText(
         )
     )
     val animatedColor by animateColorAsState(
-        targetValue = if (isLessThan10Seconds(duration = duration))
+        targetValue = if (isLessThan10Seconds(remainingDuration = remainingDuration))
             MaterialTheme.colors.error
         else
             MaterialTheme.colors.onBackground
@@ -131,7 +135,7 @@ private fun TicTocDurationText(
         text = duration,
         modifier = Modifier
             .fillMaxWidth()
-            .alpha(alpha = if (isLessThan10Seconds(duration = duration)) alpha else 0.6f)
+            .alpha(alpha = if (isLessThan10Seconds(remainingDuration = remainingDuration)) alpha else 0.6f)
             .padding(32.dp),
         textAlign = TextAlign.Center,
         style = MaterialTheme.typography.h3,
@@ -239,18 +243,7 @@ private fun TicTocHeader() {
     )
 }
 
-// TODO Not hardcode this one off solution
-@Composable
-private fun isLessThan10Seconds(duration: String) = duration.contains("00:10") ||
-    duration.contains("00:09") ||
-    duration.contains("00:08") ||
-    duration.contains("00:07") ||
-    duration.contains("00:06") ||
-    duration.contains("00:05") ||
-    duration.contains("00:04") ||
-    duration.contains("00:03") ||
-    duration.contains("00:02") ||
-    duration.contains("00:01")
+private fun isLessThan10Seconds(remainingDuration: Long) = remainingDuration < 10_000L
 
 internal fun <T> handleState(
     timerState: CountDownTimerState,
